@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+.DS_Store
+.vite
+.presentation-build
+presentation
+
+# Keep the original local import dataset out of the public demo repository
+/seed/
+/scripts/seed.mjs

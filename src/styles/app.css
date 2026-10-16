@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens — repris tels quels du système posé dans Paper.
+   Palette Stripe : encre marine, blanc, un seul accent, quatre statuts.
+--------------------------------------------------------------------------- */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f6f9fc;
+  --color-border: #e3e8ee;
+  --color-border-strong: #cbd3dc;
+
+  --color-ink: #0a2540;
+  --color-ink-secondary: #425466;
+  --color-ink-muted: #6b7c93;
+
+  --color-brand: #635bff;
+  --color-brand-hover: #5046e5;
+  --color-brand-soft: #f1f1ff;
+
+  --color-present: #00a67e;
+  --color-present-soft: #e4f6f1;
+  --color-absent: #de3a3a;
+  --color-absent-soft: #fbeaea;
+  --color-leave: #b15c00;
+  --color-leave-soft: #faf0e4;
+  --color-rest: #6b7c93;
+  --color-rest-soft: #edf0f4;
+
+  /* Échelle typographique : 12 / 13 / 15 / 20 / 32 */
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 15px;
+  --text-base--line-height: 24px;
+  --text-lg: 20px;
+  --text-lg--line-height: 24px;
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-label: 0.05em;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+
+  --shadow-pop: 0 8px 24px -6px rgb(10 37 64 / 0.18), 0 2px 6px -2px rgb(10 37 64 / 0.1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-hover);
+  }
+
+  /* Les chiffres alignés en colonne sont une exigence, pas un détail : toute
+     colonne de pourcentages, de CIN ou d'effectifs doit se lire verticalement. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border: 3px solid var(--color-canvas);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
