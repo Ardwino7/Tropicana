@@ -1,0 +1,377 @@
+[
+  {
+    "employeeId": "EMP001",
+    "date": "2026-10-08",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP001",
+    "date": "2026-10-12",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP005",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP021",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP021",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP022",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP022",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP023",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP023",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP024",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP024",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP025",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP025",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP026",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP026",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP027",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP027",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP028",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP028",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP029",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP029",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP030",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP030",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP031",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP031",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP032",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP032",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP033",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP033",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP034",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP034",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP035",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP035",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP036",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP036",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP037",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP037",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP038",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP038",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP039",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP039",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP040",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP040",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP041",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP041",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP042",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP042",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP043",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP043",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP044",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP044",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP045",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP045",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP046",
+    "date": "2026-10-10",
+    "status": "present"
+  },
+  {
+    "employeeId": "EMP046",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP047",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP048",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP049",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP050",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP051",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP052",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP053",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP054",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP055",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP056",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP057",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP058",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP059",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP060",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP061",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP062",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP063",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP064",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP065",
+    "date": "2026-10-11",
+    "status": "absent"
+  },
+  {
+    "employeeId": "EMP066",
+    "date": "2026-10-11",
+    "status": "absent"
+  }
+]

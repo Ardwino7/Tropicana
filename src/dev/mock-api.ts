@@ -13,7 +13,7 @@
  * ==========================================================================*/
 
 import employeesRaw from "./fixtures/employees.json";
-import attendancesRaw from "@/../seed/attendances.json";
+import attendancesRaw from "./fixtures/attendances.json";
 import type { AttendanceStatus, DocumentKind } from "@/types/domain";
 
 const USERS = [
