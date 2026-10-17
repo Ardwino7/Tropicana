@@ -13,7 +13,7 @@
  * ==========================================================================*/
 
 import employeesRaw from "./fixtures/employees.json";
-import attendancesRaw from "../../seed/attendances.json";
+import attendancesRaw from "@/../seed/attendances.json";
 import type { AttendanceStatus, DocumentKind } from "@/types/domain";
 
 const USERS = [
@@ -61,6 +61,11 @@ const KIND_PREFIX: Record<DocumentKind, string> = {
 };
 
 type Row = Record<string, unknown>;
+interface SeedAttendance {
+  employeeId: string;
+  date: string;
+  status: AttendanceStatus;
+}
 interface Tables {
   zones: Row[];
   employees: Row[];
@@ -139,8 +144,9 @@ function reset() {
     };
   });
 
+  const seedAttendances = attendancesRaw as SeedAttendance[];
   const real = new Map(
-    attendancesRaw
+    seedAttendances
       .map((cell) => ({ ...cell, date: `${monthStart.slice(0, 7)}-${String(cell.date).slice(-2)}` }))
       .filter((cell) => cell.date <= iso(today()))
       .map((cell) => [`${cell.employeeId}|${cell.date}`, cell.status as AttendanceStatus]),
