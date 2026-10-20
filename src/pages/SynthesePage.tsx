@@ -48,6 +48,7 @@ const SERIES = [
 export default function SynthesePage() {
   const today = todayISO();
   const [month, setMonth] = useState(() => today.slice(0, 7));
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const bounds = useMemo(() => monthBounds(`${month}-01`), [month]);
 
   const daily = useQuery(dailyRangeQuery(bounds.from, bounds.to));
@@ -80,7 +81,7 @@ export default function SynthesePage() {
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => setMonth(shiftMonth(month, -1))}
+              onClick={() => { setMonth(shiftMonth(month, -1)); setSelectedDay(null); }}
               aria-label="Mois précédent"
             >
               ←
@@ -88,7 +89,7 @@ export default function SynthesePage() {
             <span className="min-w-[128px] px-1 text-center text-sm font-medium tracking-tight text-ink">
               {formatMonth(`${month}-01`)}
             </span>
-            <Button size="sm" variant="ghost" onClick={() => setMonth(shiftMonth(month, 1))} aria-label="Mois suivant">
+            <Button size="sm" variant="ghost" onClick={() => { setMonth(shiftMonth(month, 1)); setSelectedDay(null); }} aria-label="Mois suivant">
               →
             </Button>
           </div>
@@ -140,7 +141,7 @@ export default function SynthesePage() {
           <Card>
             <CardHeader
               title="Jour par jour"
-              subtitle="Barres empilées par statut. Les repos hebdomadaires restent visibles pour ne pas gonfler le taux de présence."
+              subtitle="Cliquez sur une barre pour afficher les salariés de la journée. Les repos restent visibles dans les totaux."
             />
             <div className="h-[240px] px-2 py-3">
               <ResponsiveContainer width="100%" height="100%">
@@ -183,11 +184,24 @@ export default function SynthesePage() {
                       stackId="jour"
                       fill={series.fill}
                       radius={series.key === "rest" ? [3, 3, 0, 0] : 0}
+                      cursor="pointer"
+                      onClick={(entry: unknown) => {
+                        if (!entry || typeof entry !== "object" || !("payload" in entry)) return;
+                        const day = (entry as { payload?: DayCell }).payload;
+                        if (day?.iso) setSelectedDay(day.iso);
+                      }}
                     />
                   ))}
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            {selectedDay && (
+              <DayRoster
+                day={selectedDay}
+                employees={(employees.data ?? []).filter((employee) => employee.status === "active")}
+                attendance={cells.data ?? []}
+              />
+            )}
           </Card>
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -205,7 +219,7 @@ export default function SynthesePage() {
                   </span>
                 }
               />
-              <CalendarGrid days={days} month={month} today={today} />
+              <CalendarGrid days={days} month={month} today={today} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
             </Card>
 
             <Card>
@@ -324,7 +338,19 @@ function Kpi({
 
 const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
 
-function CalendarGrid({ days, month, today }: { days: DayCell[]; month: string; today: string }) {
+function CalendarGrid({
+  days,
+  month,
+  today,
+  selectedDay,
+  onSelectDay,
+}: {
+  days: DayCell[];
+  month: string;
+  today: string;
+  selectedDay: string | null;
+  onSelectDay: (day: string) => void;
+}) {
   const offset = (parseDay(`${month}-01`).getDay() + 6) % 7;
   return (
     <div className="px-4 py-3.5">
@@ -338,11 +364,16 @@ function CalendarGrid({ days, month, today }: { days: DayCell[]; month: string; 
       <div className="grid grid-cols-7 gap-1.5">
         {Array.from({ length: offset }, (_, index) => <span key={`pad-${index}`} />)}
         {days.map((cell) => (
-          <div
+          <button
             key={cell.iso}
+            type="button"
+            aria-label={`${cell.label}: ${cell.present} présents, ${cell.absent} absents. Cliquer pour voir les salariés.`}
+            aria-pressed={selectedDay === cell.iso}
+            onClick={() => onSelectDay(cell.iso)}
             title={`${cell.label} — ${cell.recorded ? `${formatRate(cell.rate, 1, 0)} de présence, ${cell.present}/${cell.workable}` : "aucune saisie"}`}
             className={clsx(
-              "flex h-[46px] flex-col justify-between rounded-md border p-1.5",
+              "flex h-[46px] flex-col justify-between rounded-md border p-1.5 text-left transition hover:ring-2 hover:ring-brand/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+              selectedDay === cell.iso && "ring-2 ring-brand",
               cell.future
                 ? "border-border bg-canvas"
                 : cell.recorded === 0
@@ -356,13 +387,59 @@ function CalendarGrid({ days, month, today }: { days: DayCell[]; month: string; 
             <span className={clsx("tnum text-right text-[11px] leading-none", textClass(cell))}>
               {cell.future || cell.recorded === 0 ? "·" : cell.present}
             </span>
-          </div>
+          </button>
         ))}
       </div>
       <p className="mt-2.5 text-[11px] leading-4 text-ink-muted">
         Case pointillée = journée sans aucune saisie. Ce n'est pas un statut : le pointage reste à faire.{" "}
         {today.slice(0, 7) === month && <span className="text-ink-secondary">La case du jour est encadrée.</span>}
       </p>
+    </div>
+  );
+}
+
+function DayRoster({ day, employees, attendance }: { day: string; employees: Employee[]; attendance: Attendance[] }) {
+  const rows = attendance.filter((row) => row.day === day);
+  const byEmployee = new Map(rows.map((row) => [row.employee_id, row.status]));
+  const groups = [
+    { status: "present", label: "Présents", tone: "text-present" },
+    { status: "absent", label: "Absents", tone: "text-absent" },
+    { status: "leave", label: "En congé", tone: "text-leave" },
+    { status: "rest", label: "En repos", tone: "text-ink-muted" },
+    { status: "not_recorded", label: "Non pointés", tone: "text-ink-muted" },
+  ] as const;
+
+  return (
+    <div className="border-t border-border bg-canvas px-4 py-3">
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-semibold capitalize text-ink">Effectif du {formatMediumDay(day)}</h3>
+        <span className="text-[11px] text-ink-muted">Cliquez sur une autre date pour consulter sa liste.</span>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {groups.map((group) => {
+          const members = employees.filter((employee) => {
+            const status = byEmployee.get(employee.id);
+            return group.status === "not_recorded" ? status === undefined : status === group.status;
+          });
+          return (
+            <section key={group.status} className="rounded-lg border border-border bg-surface p-3">
+              <h4 className={clsx("text-xs font-semibold", group.tone)}>{group.label} · {members.length}</h4>
+              {members.length ? (
+                <ul className="mt-2 max-h-36 space-y-1 overflow-y-auto">
+                  {members.map((employee) => (
+                    <li key={employee.id} className="truncate text-xs">
+                      <Link to={`/salaries/${employee.id}`} className="text-ink-secondary hover:text-brand hover:underline">{displayName(employee.full_name)}</Link>
+                      <span className="ml-1 font-mono text-[10px] text-ink-muted">{employee.matricule}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-[11px] text-ink-muted">Aucun salarié.</p>
+              )}
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -34,6 +34,7 @@ export function missingKinds(dossier: DossierStatus): string[] {
   if (!dossier.has_cin_doc) missing.push("CIN (copie)");
   if (!dossier.has_medical) missing.push("certificat médical");
   if (!dossier.has_photo) missing.push("photo");
+  if (!dossier.has_warning) missing.push("avertissement");
   return missing;
 }
 

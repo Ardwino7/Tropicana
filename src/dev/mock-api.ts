@@ -57,6 +57,7 @@ const KIND_PREFIX: Record<DocumentKind, string> = {
   photo: "PHOTO",
   medical: "VISITE",
   insurance: "ASSURANCE",
+  warning: "AVERTISSEMENT",
   other: "DOCUMENT",
 };
 
@@ -189,7 +190,7 @@ function reset() {
   store.documents = [];
   for (const [index, employee] of store.employees.entries()) {
     if (fnv(`${employee.matricule}|dossier`) % 6 !== 0) continue;
-    const kinds: DocumentKind[] = ["contract", "cin", "rib", "medical", "insurance"];
+    const kinds: DocumentKind[] = ["contract", "cin", "rib", "medical", "insurance", "warning"];
     for (const [slot, kind] of kinds.entries()) {
       if (kind === "cin" && !employee.cin) continue;
       if (slot === 2 && index % 7 === 3) continue;
@@ -306,6 +307,7 @@ function view(name: string): Row[] {
           has_insurance: has("insurance"),
           has_rib: Boolean(employee.rib),
           has_photo: has("photo"),
+          has_warning: has("warning"),
           has_expired_document: docs.some((doc) => doc.expires_on && String(doc.expires_on) < iso(today())),
           document_count: docs.length,
         };

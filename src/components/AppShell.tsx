@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { useAuth, homeFor } from "@/auth/AuthContext";
@@ -84,27 +84,17 @@ export function AppShell() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-3 border-b border-border bg-ink px-4 py-2.5 lg:hidden">
-          <span className="text-sm font-semibold text-white">Pointage effectifs</span>
-          <div className="flex items-center gap-1.5">
-            {items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  clsx("rounded-md px-2 py-1 text-xs", isActive ? "bg-white/15 text-white" : "text-white/60")
-                }
-              >
-                {item.icon}
-              </NavLink>
-            ))}
-            <Button size="sm" variant="quiet" onClick={() => void signOut().then(() => navigate(homeFor(role)))}>
-              Quitter
-            </Button>
+        <header className="flex items-center justify-between gap-3 border-b border-white/10 bg-ink px-4 py-3 lg:hidden">
+          <div className="min-w-0">
+            <span className="block text-sm font-semibold text-white">Pointage effectifs</span>
+            <span className="block truncate text-[11px] text-white/60">{displayName(profile?.full_name ?? "")} · {ROLE_LABEL[role ?? ""] ?? "—"}</span>
           </div>
+          <Button size="sm" variant="quiet" onClick={() => void signOut().then(() => navigate("/connexion", { replace: true }))}>
+            Quitter
+          </Button>
         </header>
 
-        <main className="mx-auto w-full max-w-[1180px] flex-1 px-4 py-5 sm:px-6">
+        <main className="mx-auto w-full max-w-[1180px] flex-1 px-3 pt-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-5 lg:pb-5">
           {isMockMode && (
             <p className="mb-4 rounded-md border border-leave/30 bg-leave-soft px-3 py-1.5 text-xs text-leave">
               Jeu de fixtures local — aucune connexion à votre projet Supabase. Retirez VITE_MOCK_API pour travailler sur les
@@ -113,6 +103,22 @@ export function AppShell() {
           )}
           <Outlet />
         </main>
+        <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-0 z-40 grid border-t border-white/10 bg-ink/95 px-2 pt-1.5 pb-[calc(.375rem+env(safe-area-inset-bottom))] shadow-[0_-8px_28px_rgba(10,37,64,.18)] backdrop-blur lg:hidden" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` } as CSSProperties}>
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              aria-label={item.label}
+              className={({ isActive }) => clsx(
+                "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-medium transition-colors",
+                isActive ? "bg-white/12 text-white" : "text-white/60 hover:text-white",
+              )}
+            >
+              <span className="text-white/80">{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
     </div>
   );
@@ -120,12 +126,12 @@ export function AppShell() {
 
 export function PageHeader({ title, subtitle, actions }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-end">
       <div className="min-w-0">
         <h1 className="text-display font-semibold tracking-tight text-ink">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-ink-secondary">{subtitle}</p>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2 sm:justify-end">{actions}</div>}
     </div>
   );
 }

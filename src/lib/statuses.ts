@@ -67,6 +67,7 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
   "photo",
   "medical",
   "insurance",
+  "warning",
   "other",
 ];
 
@@ -77,8 +78,9 @@ export const DOCUMENT_KIND_META: Record<DocumentKind, { label: string; badge: st
   photo: { label: "Photo", badge: "bg-brand-soft text-brand", prefix: "PHOTO" },
   medical: { label: "Certificat médical", badge: "bg-brand-soft text-brand", prefix: "CERTIFICAT_MEDICAL" },
   insurance: { label: "Assurance", badge: "bg-brand-soft text-brand", prefix: "ASSURANCE" },
+  warning: { label: "Avertissement", badge: "bg-absent-soft text-absent", prefix: "AVERTISSEMENT" },
   other: { label: "Autre", badge: "bg-rest-soft text-ink-secondary", prefix: "DOCUMENT" },
 };
 
 /** Documents nécessaires pour qu'un dossier salarié soit complet. */
-export const REQUIRED_KINDS: readonly DocumentKind[] = ["cin", "contract", "photo", "medical"];
+export const REQUIRED_KINDS: readonly DocumentKind[] = ["cin", "contract", "photo", "medical", "warning"];

@@ -162,7 +162,7 @@ export default function EffectifPage() {
                     </td>
                     <td className="px-3 py-2.5">
                       <Badge
-                        title={complete ? "CIN et RIB renseignés, quatre fichiers requis présents" : missingKinds(dossier).join(", ")}
+                        title={complete ? "CIN et RIB renseignés, cinq fichiers requis présents" : missingKinds(dossier).join(", ")}
                         className={complete ? "bg-present-soft text-present" : "bg-leave-soft text-leave"}
                       >
                         {complete ? "Complet" : `${REQUIRED_KINDS.length + 2 - missingKinds(dossier).length} / ${REQUIRED_KINDS.length + 2}`}
@@ -221,6 +221,7 @@ function required(dossier: DossierStatus | undefined): DossierStatus {
       has_insurance: false,
       has_rib: false,
       has_photo: false,
+      has_warning: false,
       has_expired_document: false,
       document_count: 0,
     }

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
@@ -58,15 +58,31 @@ export default function EmployeePage() {
 
   const toast = useToast();
   const [editing, setEditing] = useState(false);
+  const [downloadedIds, setDownloadedIds] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(`employee-downloads:${id}`) ?? "[]") as unknown;
+      return Array.isArray(saved) ? saved.filter((value): value is string => typeof value === "string") : [];
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(`employee-downloads:${id}`) ?? "[]") as unknown;
+      setDownloadedIds(Array.isArray(saved) ? saved.filter((value): value is string => typeof value === "string") : []);
+    } catch {
+      setDownloadedIds([]);
+    }
+  }, [id]);
   const upload = useUploadDocument(id);
   const verify = useVerifyDocument(id);
   const remove = useDeleteDocument(id);
   const download = useDownloadDocument();
   const setStatus = useSetEmployeeStatus();
-  const [kind, setKind] = useState<DocumentKind>("contract");
+  const [kind, setKind] = useState<DocumentKind>("insurance");
   const [expiry, setExpiry] = useState("");
   const input = useRef<HTMLInputElement>(null);
-  const photoInput = useRef<HTMLInputElement>(null);
+  const requiredInputs = useRef<Partial<Record<DocumentKind, HTMLInputElement>>>({});
 
   const cells = useMemo(() => {
     const map = new Map<string, string>();
@@ -131,12 +147,23 @@ export default function EmployeePage() {
     }
   }
 
+  async function downloadFile(doc: EmployeeDocument) {
+    await download.mutateAsync({ storagePath: doc.storage_path, fileName: doc.file_name });
+    const next = downloadedIds.includes(doc.id) ? downloadedIds : [...downloadedIds, doc.id];
+    setDownloadedIds(next);
+    try {
+      window.localStorage.setItem(`employee-downloads:${id}`, JSON.stringify(next));
+    } catch {
+      // Keep the current-page indicator even when local storage is unavailable.
+    }
+  }
+
   return (
     <>
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <Avatar name={person.full_name} size={40} />
+            <Avatar name={person.full_name} size={40} src={photoIsImage ? photoPreview.data : null} />
             <span className="flex flex-col">
               <span>{name}</span>
               <span className="font-mono text-xs font-normal text-ink-muted">
@@ -192,7 +219,7 @@ export default function EmployeePage() {
               </div>
             )}
             {photoDocument && !photoIsImage && (
-              <Button size="sm" variant="quiet" onClick={() => void download.mutateAsync({ storagePath: photoDocument.storage_path, fileName: photoDocument.file_name })}>
+              <Button size="sm" variant="quiet" onClick={() => void downloadFile(photoDocument)}>
                 Ouvrir la pièce
               </Button>
             )}
@@ -201,7 +228,7 @@ export default function EmployeePage() {
               <button
                 type="button"
                 disabled={upload.isPending}
-                onClick={() => photoInput.current?.click()}
+                onClick={() => requiredInputs.current.photo?.click()}
                 className="text-[11px] font-medium text-brand hover:underline disabled:cursor-wait disabled:opacity-60"
               >
                 {upload.isPending ? "Téléversement…" : "Ajouter une photo"}
@@ -223,79 +250,81 @@ export default function EmployeePage() {
                 ? `Dossier complet — ${presentRequiredCount} pièces requises`
                 : `${pluralize(missing.length, "élément obligatoire")} manquant${missing.length > 1 ? "s" : ""} : ${missing.join(", ")}`
             }
-            actions={
-              <>
-                <input
-                  ref={photoInput}
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  className="hidden"
-                  onChange={(event) => void onPick(event, "photo")}
-                />
-                <input
-                  ref={input}
-                  type="file"
-                  accept={kind === "photo" ? "image/jpeg,image/png" : "application/pdf,image/jpeg,image/png"}
-                  className="hidden"
-                  onChange={onPick}
-                />
-                <Button
-                  size="sm"
-                  variant="primary"
-                  loading={upload.isPending}
-                  onClick={() => input.current?.click()}
-                  title="Le nom du fichier est reconstruit automatiquement : TYPE_CIN_NOM_date"
-                >
-                  Téléverser
-                </Button>
-              </>
-            }
           />
 
-          <div className="flex flex-wrap items-center gap-2 border-b border-border bg-canvas px-4 py-2.5">
-            <span className="text-xs text-ink-muted">Type</span>
-            <Select value={kind} onChange={(event) => setKind(event.target.value as DocumentKind)} className="h-[30px] w-[150px] text-xs">
-              {DOCUMENT_KINDS.map((entry) => (
-                <option key={entry} value={entry}>
-                  {DOCUMENT_KIND_META[entry].label}
-                </option>
-              ))}
-            </Select>
-            <span className="ml-2 text-xs text-ink-muted">Validité</span>
-            <input
-              type="date"
-              value={expiry}
-              onChange={(event) => setExpiry(event.target.value)}
-              className="h-[30px] rounded-md border border-border bg-surface px-2 font-mono text-xs text-ink"
-              aria-label="Date d'expiration de la pièce"
-            />
-            <span className="ml-auto truncate font-mono text-[11px] text-ink-muted">
-              {DOCUMENT_KIND_META[kind].prefix}_{(person.cin ?? "SANS-CIN").toUpperCase()}_{fileSlug(person.full_name) || "SALARIE"}_
-              {todayISO()}.{kind === "photo" ? "jpg" : "pdf"}
-            </span>
+          <ul className="divide-y divide-border">
+            {REQUIRED_KINDS.map((entry) => {
+              const document = rows.find((doc) => doc.kind === entry);
+              return (
+                <li key={entry} className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:gap-3 sm:px-4 sm:py-2.5">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium text-ink">{DOCUMENT_KIND_META[entry].label}</span>
+                    <span className={clsx("block truncate text-[11px]", document ? "text-present" : "text-absent")}>
+                      {document ? `${downloadedIds.includes(document.id) ? "Téléchargé sur cet appareil" : "Déposé · téléchargement disponible"} · ${document.original_name}` : "À fournir"}
+                    </span>
+                  </span>
+                  <input
+                    ref={(element) => {
+                      if (element) requiredInputs.current[entry] = element;
+                    }}
+                    type="file"
+                    accept={entry === "photo" ? "image/jpeg,image/png" : "application/pdf,image/jpeg,image/png"}
+                    className="hidden"
+                    onChange={(event) => void onPick(event, entry)}
+                  />
+                  <div className="flex w-full gap-2 sm:w-auto">
+                    {document && <Button size="sm" variant="default" className="min-h-10 flex-1 sm:min-h-0 sm:flex-none" loading={download.isPending} disabled={download.isPending} onClick={() => void downloadFile(document)}>{downloadedIds.includes(document.id) ? "Télécharger à nouveau" : "Télécharger"}</Button>}
+                    <Button size="sm" variant={document ? "default" : "primary"} className="min-h-10 flex-1 sm:min-h-0 sm:flex-none" loading={upload.isPending} disabled={upload.isPending} onClick={() => requiredInputs.current[entry]?.click()}>
+                      {document ? "Remplacer" : "Ajouter"}
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="border-t border-border bg-canvas px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-ink-muted">Autre pièce</span>
+              <Select value={kind} onChange={(event) => setKind(event.target.value as DocumentKind)} className="h-[30px] w-[150px] text-xs">
+                {DOCUMENT_KINDS.filter((entry) => !REQUIRED_KINDS.includes(entry)).map((entry) => (
+                  <option key={entry} value={entry}>{DOCUMENT_KIND_META[entry].label}</option>
+                ))}
+              </Select>
+              <label className="ml-1 flex items-center gap-2 text-xs text-ink-muted">
+                Validité
+                <input type="date" value={expiry} onChange={(event) => setExpiry(event.target.value)} className="h-[30px] rounded-md border border-border bg-surface px-2 font-mono text-xs text-ink" aria-label="Date d'expiration de la pièce" />
+              </label>
+              <input ref={input} type="file" accept="application/pdf,image/jpeg,image/png" className="hidden" onChange={onPick} />
+              <Button size="sm" variant="default" loading={upload.isPending} disabled={upload.isPending} onClick={() => input.current?.click()}>Téléverser</Button>
+            </div>
+            <p className="mt-2 truncate font-mono text-[10px] text-ink-muted">
+              {DOCUMENT_KIND_META[kind].prefix}_{(person.cin ?? "SANS-CIN").toUpperCase()}_{fileSlug(person.full_name) || "SALARIE"}_{todayISO()}.pdf
+            </p>
           </div>
 
           {documents.isPending ? (
             <Loading label="Chargement des pièces" />
           ) : documents.error ? (
             <ErrorState message={documents.error.message} onRetry={() => void documents.refetch()} />
-          ) : rows.length === 0 ? (
+          ) : rows.filter((doc) => !REQUIRED_KINDS.includes(doc.kind)).length === 0 ? (
             <EmptyState
-              title="Aucune pièce dans ce dossier"
-              body="Renseignez la CIN et le RIB dans « Modifier la fiche ». Ajoutez ici la copie de CIN, le contrat, une photo et le certificat médical. « Autre » reste facultatif."
+              title="Aucune pièce facultative"
+              body="Les pièces requises sont listées ci-dessus. Les documents facultatifs apparaîtront ici dès leur ajout."
             />
           ) : (
             <ul>
-              {rows.map((doc) => (
+              {rows.filter((doc) => !REQUIRED_KINDS.includes(doc.kind)).map((doc) => (
                 <DocumentRow
                   key={doc.id}
                   doc={doc}
                   canVerify={role === "rh"}
                   userId={userId}
+                  downloaded={downloadedIds.includes(doc.id)}
                   busy={verify.isPending || remove.isPending || download.isPending}
                   onVerify={(verified) => void verify.mutateAsync({ id: doc.id, verified, by: userId })}
                   onRemove={() => void remove.mutateAsync({ id: doc.id, storagePath: doc.storage_path })}
-                  onDownload={() => void download.mutateAsync({ storagePath: doc.storage_path, fileName: doc.file_name })}
+                  onDownload={() => void downloadFile(doc)}
                 />
               ))}
             </ul>
@@ -425,6 +454,7 @@ function DocumentRow({
   doc,
   canVerify,
   userId,
+  downloaded,
   busy,
   onVerify,
   onRemove,
@@ -433,6 +463,7 @@ function DocumentRow({
   doc: EmployeeDocument;
   canVerify: boolean;
   userId: string | null;
+  downloaded: boolean;
   busy: boolean;
   onVerify: (verified: boolean) => void;
   onRemove: () => void;
@@ -442,9 +473,12 @@ function DocumentRow({
   const expired = Boolean(doc.expires_on && doc.expires_on < todayISO());
 
   return (
-    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 py-2.5 last:border-b-0">
-      <Badge className={meta.badge}>{meta.label}</Badge>
-      <div className="min-w-[220px] flex-1">
+    <li className="flex flex-col gap-2.5 border-b border-border px-3 py-3 last:border-b-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2 sm:px-4 sm:py-2.5">
+      <div className="flex min-w-0 items-center gap-2 sm:contents">
+        <Badge className={meta.badge}>{meta.label}</Badge>
+        <span className={clsx("ml-auto text-[10px] sm:hidden", downloaded ? "text-present" : "text-ink-muted")}>{downloaded ? "Téléchargé ici" : "À télécharger"}</span>
+      </div>
+      <div className="min-w-0 flex-1 sm:min-w-[220px]">
         <p className="truncate font-mono text-xs text-ink" title={doc.file_name}>
           {doc.file_name}
         </p>
@@ -465,7 +499,7 @@ function DocumentRow({
 
       <span
         className={clsx(
-          "flex w-[112px] items-center justify-end gap-1.5 text-[11px]",
+          "flex items-center gap-1.5 text-[11px] sm:w-[112px] sm:justify-end",
           doc.verified_at ? "text-present" : "text-ink-muted",
         )}
         title={doc.verified_at ? `Vérifiée le ${formatMediumDay(doc.verified_at)}` : "Pas encore vérifiée par un RH"}
@@ -474,16 +508,17 @@ function DocumentRow({
         {doc.verified_at ? "Vérifiée RH" : "À vérifier"}
       </span>
 
-      <div className="flex items-center gap-1">
-        <Button size="sm" variant="ghost" onClick={onDownload}>
-          Télécharger
+      <div className="flex w-full flex-wrap items-center gap-1 sm:w-auto">
+        <span className={clsx("mr-auto hidden text-[10px] sm:inline", downloaded ? "text-present" : "text-ink-muted")}>{downloaded ? "Téléchargé ici" : "À télécharger"}</span>
+        <Button size="sm" variant="ghost" className="min-h-10 flex-1 sm:min-h-0 sm:flex-none" onClick={onDownload}>
+          {downloaded ? "À nouveau" : "Télécharger"}
         </Button>
         {canVerify && (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onVerify(!doc.verified_at)}>
+          <Button size="sm" variant="ghost" className="min-h-10 flex-1 sm:min-h-0 sm:flex-none" disabled={busy} onClick={() => onVerify(!doc.verified_at)}>
             {doc.verified_at ? "Annuler la vérif." : "Vérifier"}
           </Button>
         )}
-        <Button size="sm" variant="ghost" disabled={busy} onClick={onRemove} aria-label={`Retirer ${doc.file_name}`}>
+        <Button size="sm" variant="ghost" className="min-h-10 flex-1 sm:min-h-0 sm:flex-none" disabled={busy} onClick={onRemove} aria-label={`Retirer ${doc.file_name}`}>
           Retirer
         </Button>
       </div>

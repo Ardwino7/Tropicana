@@ -100,17 +100,17 @@ export function Field({ label, hint, children, htmlFor }: { label: string; hint?
 // Affichage
 // ---------------------------------------------------------------------------
 
-export function Avatar({ name, size = 32, className }: { name: string; size?: number; className?: string }) {
+export function Avatar({ name, size = 32, src, className }: { name: string; size?: number; src?: string | null; className?: string }) {
   return (
     <span
       aria-hidden="true"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
       className={clsx(
-        "inline-flex shrink-0 items-center justify-center rounded-full bg-brand-soft font-semibold tracking-tight text-brand",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-soft font-semibold tracking-tight text-brand",
         className,
       )}
     >
-      {initials(name)}
+      {src ? <img src={src} alt="" className="h-full w-full object-cover" /> : initials(name)}
     </span>
   );
 }
@@ -154,12 +154,12 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <header className={clsx("flex items-center justify-between gap-4 border-b border-border px-4 py-3", className)}>
+    <header className={clsx("flex flex-col items-start justify-between gap-2 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:gap-4", className)}>
       <div className="min-w-0">
-        <h2 className="truncate text-base font-semibold tracking-tight text-ink">{title}</h2>
-        {subtitle && <p className="mt-0.5 truncate text-xs text-ink-muted">{subtitle}</p>}
+        <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
+        {subtitle && <p className="mt-0.5 line-clamp-2 text-xs text-ink-muted">{subtitle}</p>}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">{actions}</div>}
     </header>
   );
 }

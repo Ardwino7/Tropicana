@@ -95,7 +95,7 @@ export async function fetchEmployeeAttendanceRange(employeeId: string, from: str
 export async function fetchDossierStatuses(): Promise<DossierStatus[]> {
   const { data, error } = await supabase
     .from("employee_dossier_status")
-    .select("employee_id, matricule, full_name, zone_code, has_cin, has_contract, has_cin_doc, has_medical, has_insurance, has_expired_document, document_count, has_rib, has_photo");
+    .select("employee_id, matricule, full_name, zone_code, has_cin, has_contract, has_cin_doc, has_medical, has_insurance, has_expired_document, document_count, has_rib, has_photo, has_warning");
   return unwrap({ data, error }, "chargement de l'état des dossiers");
 }
 

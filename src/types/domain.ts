@@ -2,7 +2,7 @@
 
 export type AppRole = "chef_de_service" | "rh";
 export type AttendanceStatus = "present" | "absent" | "leave" | "rest";
-export type DocumentKind = "contract" | "cin" | "rib" | "photo" | "medical" | "insurance" | "other";
+export type DocumentKind = "contract" | "cin" | "rib" | "photo" | "medical" | "insurance" | "warning" | "other";
 export type ContractType = "cdi" | "cdd" | "stage" | "interim";
 export type EmployeeStatus = "active" | "archived";
 
@@ -109,6 +109,7 @@ export interface DossierStatus {
   has_insurance: boolean;
   has_rib: boolean;
   has_photo: boolean;
+  has_warning: boolean;
   has_expired_document: boolean;
   document_count: number;
 }
